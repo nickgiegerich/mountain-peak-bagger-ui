@@ -6,14 +6,17 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
   const auth = useAuth();
 
   useEffect(() => {
-    if (localStorage.getItem("token") !== null) {
-      window.location.replace("http://localhost:3000/dashboard");
-    } else {
-      setLoading(false);
-    }
+    auth.verify().then((value) => {
+      if (value) {
+        window.location.replace("http://localhost:3000/dashboard");
+      } else {
+        setLoading(value);
+      }
+    });
   }, []);
 
   const onSubmit = (e) => {

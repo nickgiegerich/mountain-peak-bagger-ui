@@ -72,7 +72,25 @@ function useAuth() {
         localStorage.clear();
         return false;
       }
-    }, 
+    },
+    async verify() {
+      const res = await fetch("http://127.0.0.1:8000/users/auth/user/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${localStorage.getItem("token")}`,
+        },
+      });
+      const data = await res.json();
+      if (data.pk) {
+        console.log(data)
+        return Promise.resolve(true);
+      } else {
+        console.log(data)
+        localStorage.clear();
+        return false;
+      }
+    },
   };
 }
 

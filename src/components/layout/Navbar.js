@@ -2,6 +2,7 @@ import React, { useState, useEffect, Fragment } from "react";
 import { Link } from "react-router-dom";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { MenuIcon, XIcon } from "@heroicons/react/outline";
+import useAuth from "../../customHooks/AuthHook";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -9,6 +10,7 @@ function classNames(...classes) {
 
 const Navbar = () => {
   const [isAuth, setIsAuth] = useState(false);
+  const auth = useAuth();
 
   const authNav = [{ name: "Dashboard", to: "/dashboard", current: true }];
 
@@ -18,9 +20,9 @@ const Navbar = () => {
   ];
 
   useEffect(() => {
-    if (localStorage.getItem("token") !== null) {
-      setIsAuth(true);
-    }
+    auth.verify().then((value) => {
+      setIsAuth(value);
+    });
   }, []);
 
   return (
