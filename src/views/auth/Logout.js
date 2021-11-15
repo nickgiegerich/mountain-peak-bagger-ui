@@ -15,22 +15,7 @@ const Logout = () => {
 
   const handleLogout = (e) => {
     e.preventDefault();
-
     auth.logout();
-
-    // fetch('http://127.0.0.1:8000/users/auth/logout/', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     Authorization: `Token ${localStorage.getItem('token')}`
-    //   }
-    // })
-    //   .then(res => res.json())
-    //   .then(data => {
-    //     console.log(data);
-    //     localStorage.clear();
-    //     window.location.replace('http://localhost:3000/login');
-    //   });
   };
 
   return (

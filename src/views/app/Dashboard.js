@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Fragment } from "react";
 import useAuth from "../../customHooks/AuthHook";
+import { PeaksTable } from "./PeaksTable";
 
 const Dashboard = () => {
   const [userEmail, setUserEmail] = useState("");
@@ -8,6 +9,10 @@ const Dashboard = () => {
   const [peaks, setPeaks] = useState([]);
   const [authorized, setAuthorized] = useState(false);
   const auth = useAuth();
+
+  const updatePeakState = (state) => {
+    setPeaks(state);
+  };
 
   useEffect(() => {
     // TODO: need to actaully verify that this token is legit
@@ -44,7 +49,6 @@ const Dashboard = () => {
       })
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
           setPeaks(data);
         });
     }
@@ -57,16 +61,9 @@ const Dashboard = () => {
           <div className="flex w-screen justify-center">
             <h1 className="text-3xl">Dashboard</h1>
           </div>
-          <h2>Signed in as {userEmail}</h2>
-          {peaks && (
-            <ul>
-              {peaks.map((peak, idx) => (
-                <li className="" key={idx}>
-                  {peak.name}
-                </li>
-              ))}
-            </ul>
-          )}
+          <div className="flex w-screen justify-center">
+            {peaks && <PeaksTable peaks={peaks} stateChanger={updatePeakState} />}
+          </div>
         </Fragment>
       )}
     </div>

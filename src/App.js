@@ -8,7 +8,7 @@ import { AuthProvider } from "./customHooks/AuthHook";
 
 const App = () => {
   return (
-    <div className="App">
+    <div className="App h-screen bg-gray-200">
       <AuthProvider>
         <Router>
           <Navbar />
