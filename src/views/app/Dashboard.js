@@ -21,6 +21,7 @@ const Dashboard = () => {
         .then((data) => {
           setUserEmail(data.email);
           setUserId(data.pk);
+          localStorage.setItem("email", data.email)
           setLoading(false);
         });
     }
@@ -47,12 +48,16 @@ const Dashboard = () => {
     <div>
       {loading === false && (
         <Fragment>
-          <h1>Dashboard</h1>
+          <div className="flex w-screen justify-center">
+            <h1 className="text-3xl">Dashboard</h1>
+          </div>
           <h2>Signed in as {userEmail}</h2>
           {peaks && (
             <ul>
               {peaks.map((peak, idx) => (
-                <li key={idx}>{peak.name}</li>
+                <li className="" key={idx}>
+                  {peak.name}
+                </li>
               ))}
             </ul>
           )}
