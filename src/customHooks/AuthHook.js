@@ -72,7 +72,7 @@ function useAuth() {
         localStorage.clear();
         return false;
       }
-    },
+    }, 
   };
 }
 
