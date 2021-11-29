@@ -5,18 +5,21 @@ import Login from "./views/auth/Login";
 import Logout from "./views/auth/Logout";
 import Signup from "./views/auth/Signup";
 import { AuthProvider } from "./customHooks/AuthHook";
+import NotFound from "./views/404/NotFound";
 
 const App = () => {
   return (
-    <div className="App h-screen bg-gray-200">
+    <div className="App">
       <AuthProvider>
         <Router>
           <Navbar />
           <Routes>
+            <Route path="/" element={<Dashboard />} />
+            {/* <Route path="/dashboard" element={<Dashboard />} /> */}
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/logout" element={<Logout />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="*" element={<NotFound/>}/>
           </Routes>
         </Router>
       </AuthProvider>

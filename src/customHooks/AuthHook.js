@@ -24,7 +24,7 @@ function useAuth() {
         setAuthed(true);
         localStorage.clear();
         localStorage.setItem("token", data.key);
-        window.location.replace("http://localhost:3000/dashboard");
+        window.location.replace("http://localhost:3000/");
         return true;
       } else {
         setAuthed(false);
@@ -65,9 +65,10 @@ function useAuth() {
         setAuthed(true);
         localStorage.clear();
         localStorage.setItem("token", data.key);
-        window.location.replace("http://localhost:3000/dashboard");
+        window.location.replace("http://localhost:3000/");
         return true;
       } else {
+        console.log(data)
         setAuthed(false);
         localStorage.clear();
         return false;
@@ -84,11 +85,12 @@ function useAuth() {
       const data = await res.json();
       if (data.pk) {
         console.log(data)
-        return Promise.resolve(true);
+        // return Promise.resolve(true);
+        return [true, data];
       } else {
         console.log(data)
         localStorage.clear();
-        return false;
+        return [false, {}];
       }
     },
   };

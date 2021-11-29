@@ -33,11 +33,11 @@ export const PeaksTable = ({ peaks, stateChanger }) => {
   };
 
   return (
-    <div className="flex flex-col w-screen max-w-3 max-w-4xl">
+    <div className="">
       {peaks.map((peak, idx) => (
         <div key={`peak-${idx}`}>
           <div className="w-full bg-gray-900 rounded-lg shadow-lg text-gray-300 my-5 py-2">
-            <div className="flex w-full justify-center font-light text-2xl pt-2">
+            <div className=" text-center font-light text-2xl pt-2">
               {peak.name}
             </div>
             <div className="flex w-full justify-center font-sans text-lg py-5">

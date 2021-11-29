@@ -1,4 +1,6 @@
 import React, { useState, useEffect, Fragment } from "react";
+import Map from "../../components/map/Map";
+import PeakForm from "../../components/peaks/PeakForm";
 import useAuth from "../../customHooks/AuthHook";
 import { PeaksTable } from "./PeaksTable";
 
@@ -17,7 +19,7 @@ const Dashboard = () => {
   useEffect(() => {
     // TODO: need to actaully verify that this token is legit
     auth.verify().then((value) => {
-      if (value) {
+      if (value[0]) {
         fetch("http://127.0.0.1:8000/users/auth/user/", {
           method: "GET",
           headers: {
@@ -55,16 +57,22 @@ const Dashboard = () => {
   }, [userId]);
 
   return (
-    <div>
+    <div className="relative">
       {loading === false && (
-        <Fragment>
-          <div className="flex w-screen justify-center">
-            <h1 className="text-3xl">Dashboard</h1>
+        <div className="flex flex-wrap">
+          <h1 className="w-full text-black text-4xl font-thin uppercase">Dashboard</h1>
+
+          <div className="sticky top-0 w-1/2 self-start">
+            <Map />
           </div>
-          <div className="flex w-screen justify-center">
-            {peaks && <PeaksTable peaks={peaks} stateChanger={updatePeakState} />}
+
+          <div className="w-1/2 px-2">
+            <PeakForm/>
+            {peaks && (
+              <PeaksTable peaks={peaks} stateChanger={updatePeakState} />
+            )}
           </div>
-        </Fragment>
+        </div>
       )}
     </div>
   );

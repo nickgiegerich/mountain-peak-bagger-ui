@@ -11,10 +11,10 @@ const Login = () => {
 
   useEffect(() => {
     auth.verify().then((value) => {
-      if (value) {
-        window.location.replace("http://localhost:3000/dashboard");
+      if (value[0]) {
+        window.location.replace("http://localhost:3000/");
       } else {
-        setLoading(value);
+        setLoading(value[0]);
       }
     });
   }, []);
