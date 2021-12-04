@@ -1,8 +1,16 @@
 import * as React from "react";
 
-const authContext = React.createContext();
+interface AuthInterface {
+  authed: boolean, 
+  login(credentials: { email: string; password: string; }): Promise<boolean>,
+  logout(): void,
+  signup(requiredFields: {email: string, password1: string, password2: string}): Promise<boolean>,
+  verify(): Promise<[boolean, number]>
+}
 
-function useAuth() {
+const authContext = React.createContext<AuthInterface | null>(null);
+
+function useAuth(): AuthInterface {
   const [authed, setAuthed] = React.useState(false);
 
   return {
@@ -74,7 +82,7 @@ function useAuth() {
         return false;
       }
     },
-    async verify() {
+    async verify(): Promise<[boolean, number]> {
       const res = await fetch("http://127.0.0.1:8000/users/auth/user/", {
         method: "GET",
         headers: {
@@ -86,17 +94,17 @@ function useAuth() {
       if (data.pk) {
         console.log(data)
         // return Promise.resolve(true);
-        return [true, data];
+        return [true, data.pk];
       } else {
         console.log(data)
         localStorage.clear();
-        return [false, {}];
+        return [false, 0];
       }
     },
   };
 }
 
-export function AuthProvider({ children }) {
+export function AuthProvider({ children }: any) {
   const auth = useAuth();
 
   return <authContext.Provider value={auth}>{children}</authContext.Provider>;

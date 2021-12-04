@@ -1,8 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, FormEventHandler, SetStateAction, useEffect, useState } from "react";
 import useAuth from "../../customHooks/AuthHook";
 import moment from "moment";
+import { IPeak } from "../../interfaces/PeakInterface";
 
-const PeakForm = () => {
+interface IProps {
+  peaks: IPeak[],
+  setPeaks: Dispatch<SetStateAction<IPeak[]>>;
+}
+
+const PeakForm = ({ peaks, setPeaks }: IProps) => {
   const [inputs, setInputs] = useState({
     name: "",
     date: "",
@@ -13,7 +19,7 @@ const PeakForm = () => {
   const [user, setUser] = useState();
   const auth = useAuth();
 
-  const onChange = (e) => {
+  const onChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
     setInputs((prevState) => ({
       ...prevState,
@@ -21,7 +27,7 @@ const PeakForm = () => {
     }));
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // format date
@@ -37,28 +43,23 @@ const PeakForm = () => {
       location_descr: inputs.description,
     };
     // NEED TO VERIFY THE USER BEFORE POST
-    auth.verify().then((value) => {
-      // SEND DATA TO BACKEND
-      fetch(`http://127.0.0.1:8000/peaks/user/${value[1].pk}/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Token ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(newPeak),
-      }).then( // FETCH THE NEWEST DATA
-        fetch(`http://127.0.0.1:8000/peaks/user/${value[1].pk}/`, {
-          method: "GET",
+    auth!.verify().then((value) => {
+      if (value[0]) {
+        const primary_key = value[1];
+        // SEND DATA TO BACKEND
+        fetch(`http://127.0.0.1:8000/peaks/user/${value[1]}/`, {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Token ${localStorage.getItem("token")}`,
           },
+          body: JSON.stringify(newPeak),
+        }).then(async (res) => {
+          const data = await res.json();
+          console.log(data)
+          return setPeaks(prev => ([...prev, data]));
         })
-          .then((res) => res.json())
-          .then((data) => {
-            console.log(data);
-          })
-      );
+      }
     });
   };
   return (
@@ -73,7 +74,7 @@ const PeakForm = () => {
           <div className="w-1/2">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
-              for="name"
+              htmlFor="name"
             >
               Peak Name
             </label>
@@ -92,7 +93,7 @@ const PeakForm = () => {
           <div className="w-1/2">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
-              for="date"
+              htmlFor="date"
             >
               Summit Date
             </label>
@@ -110,7 +111,7 @@ const PeakForm = () => {
           <div className="w-1/2">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
-              for="latitude"
+              htmlFor="latitude"
             >
               Peak Latitude
             </label>
@@ -130,7 +131,7 @@ const PeakForm = () => {
           <div className="w-1/2">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
-              for="longitude"
+              htmlFor="longitude"
             >
               Peak Longitude
             </label>
@@ -150,7 +151,7 @@ const PeakForm = () => {
           <div className="w-1/2">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
-              for="description"
+              htmlFor="description"
             >
               Peak Description
             </label>
@@ -158,7 +159,6 @@ const PeakForm = () => {
               className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="description"
               name="description"
-              type="text"
               maxLength={300}
               placeholder="Peak Description"
               value={inputs.description}
@@ -170,7 +170,7 @@ const PeakForm = () => {
             <button
               className="bg-green-500 items-center hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               type="submit"
-              //   on={onSubmit}
+            //   on={onSubmit}
             >
               Submit!
             </button>

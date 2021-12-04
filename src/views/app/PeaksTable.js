@@ -1,36 +1,23 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { PencilIcon, XIcon, PlusCircleIcon } from "@heroicons/react/outline";
 
-export const PeaksTable = ({ peaks, stateChanger }) => {
-  const [newPeak, setNewPeak] = useState(null);
+export const PeaksTable = ({ peaks}) => {
   
-  const handleCreate = () => {
-    const peak = {
-      name: "Test Post from webite",
-      location_descr: "Location description",
-    };
-    console.log("create peak");
-    fetch(`http://127.0.0.1:8000/peaks/user/1/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Token ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify(peak),
-    }).then(
-      fetch(`http://127.0.0.1:8000/peaks/user/1/`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Token ${localStorage.getItem("token")}`,
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          stateChanger(data);
-        })
-    );
-  };
+  // const handleCreate = () => {
+  //   const peak = {
+  //     name: "Test Post from webite",
+  //     location_descr: "Location description",
+  //   };
+  //   console.log("create peak");
+  //   fetch(`http://127.0.0.1:8000/peaks/user/1/`, {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Authorization: `Token ${localStorage.getItem("token")}`,
+  //     },
+  //     body: JSON.stringify(peak),
+  //   })
+  // };
 
   return (
     <div className="">
@@ -66,12 +53,12 @@ export const PeaksTable = ({ peaks, stateChanger }) => {
         </div>
       ))}
       <div className="flex justify-center py-11">
-        <button onClick={handleCreate}>
+        {/* <button onClick={handleCreate}>
           <PlusCircleIcon
             className="block h-10 w-10 text-green-700"
             aria-hidden="true"
           />
-        </button>
+        </button> */}
       </div>
     </div>
   );

@@ -1,12 +1,13 @@
 import React, { useRef, useEffect, useState } from "react";
-import mapboxgl from "mapbox-gl";
+import mapboxgl, { Map } from "mapbox-gl";
+
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoibmdpZWdlcmljaCIsImEiOiJja3doejh0ajMxMzZqMm5wYWhjbjBjbXgyIn0.PXwhB9TGUnShXfonTAEHxA";
 
-const Map = () => {
-  const mapContainer = useRef(null);
-  const map = useRef(null);
+const MyMap = () => {
+  const mapContainer = useRef<string | HTMLElement>("");
+  const map = useRef<Map | null>(null);
   const [lng, setLng] = useState(-70.9);
   const [lat, setLat] = useState(42.35);
   const [zoom, setZoom] = useState(9);
@@ -22,9 +23,9 @@ const Map = () => {
   }, []);
   return (
     <div className="h-56">
-      <div ref={mapContainer} className="map-container"></div>
+      <div ref={mapContainer as React.LegacyRef<HTMLDivElement> | undefined} className="map-container"></div>
     </div>
   );
 };
 
-export default Map;
+export default MyMap;

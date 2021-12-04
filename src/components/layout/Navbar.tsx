@@ -4,7 +4,7 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { MenuIcon, XIcon } from "@heroicons/react/outline";
 import useAuth from "../../customHooks/AuthHook";
 
-function classNames(...classes) {
+function classNames(...classes: string[]): string {
   return classes.filter(Boolean).join(" ");
 }
 
@@ -20,8 +20,12 @@ const Navbar = () => {
   ];
 
   useEffect(() => {
-    auth.verify().then((value) => {
+    // ! - Non-null assertion operator
+    // use it here because we get the first value in array which is always true or false, and not the second element because that could be empty {}
+    auth!.verify().then((value) => {
       setIsAuth(value[0]);
+    }).catch((err) => {
+
     });
   }, []);
 
@@ -169,7 +173,7 @@ const Navbar = () => {
                 <Disclosure.Button
                   key={item.name}
                   as="a"
-                  href={item.href}
+                  href={item.to}
                   className={classNames(
                     item.current
                       ? "bg-gray-900 text-white"
