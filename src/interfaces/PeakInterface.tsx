@@ -1,7 +1,8 @@
 export interface IPeak {
+    id: number,
     name: string,
-    date: string,
+    summit_date: string,
     latitude: number,
     longitude: number,
-    description: string
+    location_descr: string
 }

@@ -1,8 +1,7 @@
-import React, { useState, useEffect, Fragment } from "react";
+import { useState, useEffect } from "react";
 import Map from "../../components/map/Map";
 import PeakForm from "../../components/peaks/PeakForm";
 import useAuth from "../../customHooks/AuthHook";
-import { PeaksTable } from "./PeaksTable";
 import { IPeak } from "../../interfaces/PeakInterface";
 import PeakList from "../../components/peaks/PeakList";
 
@@ -72,10 +71,7 @@ const Dashboard = () => {
 
           <div className="w-1/2 px-2">
             <PeakForm peaks={peaks} setPeaks={setPeaks} />
-            {/* {peaks && (
-              <PeaksTable peaks={peaks} />
-            )} */}
-            <PeakList peaks={peaks} />
+            <PeakList peaks={peaks} setPeaks={setPeaks} />
           </div>
         </div>
       )}
