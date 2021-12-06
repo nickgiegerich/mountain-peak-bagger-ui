@@ -6,7 +6,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [authorized, setAuthorized] = useState(false);
   const auth = useAuth();
 
   useEffect(() => {
@@ -17,7 +16,7 @@ const Login = () => {
         setLoading(value[0]);
       }
     });
-  }, []);
+  }, [auth]);
 
   const onSubmit = (e) => {
     e.preventDefault();

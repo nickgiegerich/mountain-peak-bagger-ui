@@ -27,7 +27,7 @@ const Navbar = () => {
     }).catch((err) => {
 
     });
-  }, []);
+  }, [auth]);
 
   return (
     <Disclosure as="nav" className="bg-gray-800">

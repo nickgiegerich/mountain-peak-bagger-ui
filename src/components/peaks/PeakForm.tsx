@@ -16,7 +16,6 @@ const PeakForm = ({ peaks, setPeaks }: IProps) => {
     longitude: "",
     description: "",
   });
-  const [user, setUser] = useState();
   const auth = useAuth();
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {

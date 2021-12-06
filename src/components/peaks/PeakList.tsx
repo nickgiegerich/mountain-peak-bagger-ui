@@ -24,7 +24,7 @@ const PeakList = ({ peaks, setPeaks }: IProps) => {
                 Authorization: `Token ${localStorage.getItem("token")}`,
             },
         }).then( () =>
-            setPeaks(peaks.filter(peak => peak.id != peakId))
+            setPeaks(peaks.filter(peak => peak.id !== Number(peakId)))
         ).catch((err) => console.log(err))
     }
     return (

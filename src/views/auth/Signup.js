@@ -17,7 +17,7 @@ const Signup = () => {
         setLoading(value);
       }
     });
-  }, []);
+  }, [auth]);
 
   const onSubmit = (e) => {
     e.preventDefault();
