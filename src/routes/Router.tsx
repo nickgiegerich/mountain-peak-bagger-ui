@@ -1,0 +1,61 @@
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Navbar from "../components/layout/Navbar";
+
+// import { Loading } from "../components/Loading";
+import { useAuth } from "../context/Auth";
+import NoAuth from "../service/NoAuth";
+import RequireAuth from "../service/RequireAuth";
+import NotFound from "../views/404/NotFound";
+import Dashboard from "../views/app/Dashboard";
+import Login from "../views/auth/Login";
+import Logout from "../views/auth/Logout";
+import Register from "../views/auth/Register";
+
+export const Router = () => {
+  const { authedUser, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center space-x-2 h-screen">
+        {/* <div className="transform transition-all spinner-grow inline-block w-12 h-12 bg-black bg-opacity-20 rounded-full " role="status">
+          <span className="visually-h">Loading...</span>
+          
+        </div> */}
+        <div className="w-10 h-10 bg-blue-400 rounded-full animate-bounce animation-delay-75"></div>
+        <div className="w-10 h-10 bg-blue-400 rounded-full animate-bounce animation-delay-100"></div>
+        <div className="w-10 h-10 bg-blue-400 rounded-full animate-bounce animation-delay-150"></div>
+
+      </div >
+    );
+  }
+  return (
+    <BrowserRouter>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={
+          <RequireAuth>
+            <Dashboard />
+          </RequireAuth>
+        } />
+        <Route path="/login" element={
+          <NoAuth>
+            <Login />
+          </NoAuth>
+        } />
+        <Route path="/register" element={
+          <NoAuth>
+            <Register />
+          </NoAuth>
+        } />
+        <Route path="/logout" element={
+          <RequireAuth>
+            <Logout />
+          </RequireAuth>
+        } />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+
+    </BrowserRouter>
+  );
+};

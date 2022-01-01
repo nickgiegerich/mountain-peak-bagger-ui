@@ -1,43 +1,36 @@
-import React, { useState, useEffect } from "react";
-import useAuth from "../../customHooks/AuthHook";
+import React, { useState, useEffect, useContext } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+// import useAuth from "../../customHooks/AuthHook";
+import { AuthContext, useAuth } from '../../context/Auth';
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState(false);
-  const [loading, setLoading] = useState(true);
   const auth = useAuth();
+  const navigate = useNavigate();
+  const { state } = useLocation();
 
-  useEffect(() => {
-    auth.verify().then((value) => {
-      if (value[0]) {
-        window.location.replace("http://localhost:3000/");
-      } else {
-        setLoading(value[0]);
-      }
-    });
-  }, [auth]);
-
-  const onSubmit = async (e) => {
+  const onSubmit = async (e: any) => {
     e.preventDefault();
 
-    const authorized = await auth.login({ email, password });
+    const _authorized = await auth.login(email, password)
 
-    console.log(authorized);
-
-    if (!authorized) {
-      setEmail("");
-      setPassword("");
-      setErrors(true);
+    if (_authorized) {
+      // if the we are an AuthedUser navigate to dashboard
+      setErrors(false)
+      navigate(state?.path || "/")
+    } else { 
+      setErrors(true)
     }
   };
 
   return (
     <>
-      <div className="min-h-screen flex items-center justify-center bg-blue-200 bg-auth-bg bg-no-repeat bg-cover">
-        {loading === false && (
+      <div className="min-h-screen flex items-center justify-center bg-blue-200 bg-auth-bg bg-no-repeat bg-cover bg-fixed">
+        {auth.loading === false && (
           <form
-            className="relative w-full mx-10 bg-gray-100 rounded-lg bg-opacity-50 filter backdrop-filter backdrop-blur-lg"
+            className="relative w-full sm:w-2/3 mx-10 bg-gray-100 rounded-lg bg-opacity-20 filter backdrop-filter backdrop-blur-lg"
             onSubmit={onSubmit}
           >
             {/* FORM LABEL */}
@@ -51,7 +44,7 @@ const Login = () => {
             </div>
 
             <div className="relative block mx-auto my-10 w-full text-center">
-              {loading === false && (
+              {auth.loading === false && (
                 <h1 className="text-3xl font-light">login</h1>
               )}
             </div>
@@ -91,13 +84,13 @@ const Login = () => {
             <button
               type="submit"
               value={"Login"}
-              className="relative block my-10 w-1/2 mx-auto  cursor-pointer"
+              className="relative block my-10 w-1/2 mx-auto cursor-pointer"
             >
               {/* BG Shadow */}
-              <div className="absolute inset-x-0 inset-y-0 bottom-0 bg-gray-300 border border-gray-500 rounded-lg" />
+              <div className="absolute inset-x-0 inset-y-0 bottom-0 bg-green-300 border border-gray-500 rounded-lg" />
 
               {/* Text */}
-              <div className="relative bottom-2 text-xl font-thin leading-none tracking-wider py-4 px-10 bg-gray-100 border border-gray-500 rounded-lg transform hover:translate-y-1 transition duration-200 ease-in-out">
+              <div className="relative bottom-2 text-xl font-thin leading-none tracking-wider py-4 px-10 bg-green-100 border border-gray-500 rounded-lg transform hover:translate-y-1 transition duration-200 ease-in-out">
                 login
               </div>
             </button>

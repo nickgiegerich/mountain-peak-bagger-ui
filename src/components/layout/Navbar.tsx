@@ -2,35 +2,24 @@ import { useState, useEffect, Fragment } from "react";
 import { Link } from "react-router-dom";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { MenuIcon, XIcon } from "@heroicons/react/outline";
-import useAuth from "../../customHooks/AuthHook";
+import { useAuth } from "../../context/Auth";
 
 function classNames(...classes: string[]): string {
   return classes.filter(Boolean).join(" ");
 }
 
 const Navbar = () => {
-  const [isAuth, setIsAuth] = useState(false);
   const auth = useAuth();
 
   const authNav = [{ name: "Dashboard", to: "/", current: true }];
 
   const nav = [
     { name: "Login", to: "/login", current: false },
-    { name: "Signup", to: "/signup", current: false },
+    { name: "Register", to: "/register", current: false },
   ];
 
-  useEffect(() => {
-    // ! - Non-null assertion operator
-    // use it here because we get the first value in array which is always true or false, and not the second element because that could be empty {}
-    auth!.verify().then((value) => {
-      setIsAuth(value[0]);
-    }).catch((err) => {
-
-    });
-  }, [auth]);
-
   return (
-    <Disclosure as="nav" className="bg-gray-800">
+    <Disclosure as="nav" className="bg-gray-800 border-b-2 border-gray-700 shadow-2xl">
       {({ open }) => (
         <>
           <div className="w-screen px-2 sm:px-6 lg:px-8">
@@ -62,7 +51,7 @@ const Navbar = () => {
                 </div>
                 <div className="hidden my-auto sm:block sm:ml-6">
                   <div className="flex space-x-4">
-                    {isAuth === true ? (
+                    {auth.authedUser ? (
                       <Fragment>
                         {authNav.map((item) => (
                           <Link
@@ -112,7 +101,7 @@ const Navbar = () => {
                 </button> */}
 
                 {/* Profile dropdown */}
-                {isAuth && (
+                {auth.authedUser && (
                   <Menu as="div" className="ml-3 relative">
                     <div>
                       <Menu.Button className="bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
@@ -142,7 +131,7 @@ const Navbar = () => {
                                 "block px-4 py-2 text-sm text-gray-700"
                               )}
                             >
-                              signed in as {localStorage.getItem("email")}
+                              signed in as {auth.authedUser?.user.username}
                             </p>
                           )}
                         </Menu.Item>
@@ -168,7 +157,7 @@ const Navbar = () => {
           </div>
 
           <Disclosure.Panel className="sm:hidden">
-            {isAuth === true ? (
+            {auth.authedUser ? (
               <div className="px-2 pt-2 pb-3 space-y-1">
                 {authNav.map((item) => (
                   <Disclosure.Button

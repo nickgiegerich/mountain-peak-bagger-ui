@@ -28,7 +28,7 @@ const PeakList = ({ peaks, setPeaks }: IProps) => {
         ).catch((err) => console.log(err))
     }
     return (
-        <div>
+        <div className="">
             {peaks.length ? (
                 <div>
                     {peaks.map((peak, idx) => (
@@ -64,7 +64,7 @@ const PeakList = ({ peaks, setPeaks }: IProps) => {
                     ))}
                 </div>
 
-            ) : <div>Add a Peak!</div>}
+            ) : <div className="z-50 text-white">Add a Peak!</div>}
         </div>
     )
 }
