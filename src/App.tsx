@@ -1,15 +1,16 @@
-import {Routes, Route } from "react-router-dom";
+// import { Routes, Route } from "react-router-dom";
 
-import Dashboard from "./views/app/Dashboard";
-import Login from "./views/auth/Login";
-import Logout from "./views/auth/Logout";
-import Register from "./views/auth/Register";
+// import Dashboard from "./views/app/Dashboard";
+// import Login from "./views/auth/Login";
+// import Logout from "./views/auth/Logout";
+// import Register from "./views/auth/Register";
 // import { AuthProvider } from "./customHooks/AuthHook";
-import NotFound from "./views/404/NotFound";
-import Navbar from "./components/layout/Navbar";
+// import NotFound from "./views/404/NotFound";
+// import Navbar from "./components/layout/Navbar";
 import React from "react";
 import { AuthProvider } from './context/Auth';
 import { Router } from './routes/Router';
+import { PeakProvider } from "./context/Peak";
 
 // const App = () => {
 //   return (
@@ -33,9 +34,11 @@ import { Router } from './routes/Router';
 
 const App: React.FC = () => {
   return (
-      <AuthProvider>
+    <AuthProvider>
+      <PeakProvider>
         <Router />
-      </AuthProvider>
+      </PeakProvider>
+    </AuthProvider>
   );
 };
 

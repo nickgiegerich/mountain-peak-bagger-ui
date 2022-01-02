@@ -30,27 +30,39 @@ const testPeakPost = {
   user: 1,
 };
 
-const getAllPeaks = async () => {
+const getAllPeaks = async (): Promise<PeakInterface[] | undefined> => {
   try {
     const response = await axios.get(
       process.env.REACT_APP_BASE_API_URL + "/api/peaks/",
       { headers: await authHeader() }
     );
 
-    return response.data;
+    if (response.data) {
+      return response.data;
+    } else {
+      return undefined;
+    }
   } catch (e) {}
 };
 
-const postPeak = async (peak: PeakInterface, userId: number) => {
+const postPeak = async (
+  peak: PeakInterface,
+  userId: number
+): Promise<PeakInterface | undefined> => {
   try {
-    console.log({ ...peak });
+    
     const response = await axios.post(
       process.env.REACT_APP_BASE_API_URL + "/api/peaks/",
       { ...peak, user: userId },
       { headers: await authHeader() }
     );
 
-    return response.status;
+    if (response.status === 201) {
+      return response.data;
+    } else {
+      return undefined;
+    }
+    
   } catch (e) {
     console.log(e);
   }

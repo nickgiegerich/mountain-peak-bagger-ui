@@ -49,7 +49,7 @@ const AuthProvider: React.FC = ({ children }) => {
     const login = async (email: string, password: string): Promise<undefined | AuthedUser> => {
         try {
             // call the service passing credential (email and password).
-            const _authedUser = await authService.login(email, password)            
+            const _authedUser = await authService.login(email, password)
 
             if (typeof (_authedUser) === 'object') {
                 //Set the data in the context, so the App can be notified

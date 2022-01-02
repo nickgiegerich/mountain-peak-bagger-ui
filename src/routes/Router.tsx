@@ -13,19 +13,14 @@ import Logout from "../views/auth/Logout";
 import Register from "../views/auth/Register";
 
 export const Router = () => {
-  const { authedUser, loading } = useAuth();
+  const { loading } = useAuth();
 
   if (loading) {
     return (
       <div className="flex items-center justify-center space-x-2 h-screen">
-        {/* <div className="transform transition-all spinner-grow inline-block w-12 h-12 bg-black bg-opacity-20 rounded-full " role="status">
-          <span className="visually-h">Loading...</span>
-          
-        </div> */}
         <div className="w-10 h-10 bg-blue-400 rounded-full animate-bounce animation-delay-75"></div>
         <div className="w-10 h-10 bg-blue-400 rounded-full animate-bounce animation-delay-100"></div>
         <div className="w-10 h-10 bg-blue-400 rounded-full animate-bounce animation-delay-150"></div>
-
       </div >
     );
   }

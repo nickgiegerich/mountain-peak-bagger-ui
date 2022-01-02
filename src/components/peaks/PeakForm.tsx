@@ -1,70 +1,42 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
-
-import moment from "moment";
-import { IPeak } from "../../interfaces/PeakInterface";
+import React from "react";
 import { useAuth } from "../../context/Auth";
 import { PeakInterface } from "../../interface/PeakInterface";
-import { peakService } from "../../service/peakService";
+import { usePeak } from "../../context/Peak";
 
-interface IProps {
-  peaks: IPeak[],
-  setPeaks: Dispatch<SetStateAction<IPeak[]>>;
-}
-
-const PeakForm = ({ peaks, setPeaks }: IProps) => {
-  const [inputs, setInputs] = useState({
-    name: "",
-    date: "",
-    latitude: "",
-    longitude: "",
-    description: "",
-  });
+const PeakForm = () => {
   const auth = useAuth();
+  const { setCurrentPeak, setAllPeaks, createPeak, currentPeak } = usePeak();
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
-    auth.setCurrentPeak((prevState: PeakInterface | undefined) => ({
+    setCurrentPeak((prevState: PeakInterface | undefined) => ({
       ...prevState,
       [e.target.name]: e.target.value,
     }));
   };
 
   const reset = () => {
-    // auth.setCurrentPeak({ peak_name: '', peak_description: '', latitude: undefined, longitude: undefined, summit_date: '' })
-    auth.setCurrentPeak(undefined)
+    setCurrentPeak(undefined)
   }
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(auth.currentPeak)
-    if (auth.currentPeak?.peak_name && auth.authedUser?.user.id) {
-      const _status = await peakService.postPeak(auth.currentPeak, auth.authedUser.user.id);
 
-      if (_status === 201) {
-        console.log(_status)
+    if (currentPeak?.peak_name && auth.authedUser?.user.id) {
+      const _createdPeak = await createPeak(auth.authedUser, currentPeak);
+
+      if (_createdPeak) {        
         reset();
       }
     }
-
-    // format date
-    // let date = new Date(inputs.date);
-    // let formattedDate = moment(date).format("YYYY-MM-DD");
-
-    // SET UP A NEW PEAK OBJECT
-    // const newPeak = {
-    //   name: inputs.name,
-    //   latitude: inputs.latitude === "" ? 0.0 : inputs.latitude,
-    //   longitude: inputs.longitude === "" ? 0.0 : inputs.longitude,
-    //   summit_date: formattedDate,
-    //   location_descr: inputs.description,
-    // };
-
   };
+
+
   return (
     <div className="transform transition scale-1">
       {/* <div className="text-center font-light text-xl">Bag a New Peak!</div> */}
       {
-        auth.currentPeak ? (
+        currentPeak ? (
           <form
             onSubmit={onSubmit}
             onReset={reset}
@@ -88,7 +60,7 @@ const PeakForm = ({ peaks, setPeaks }: IProps) => {
                   required
                   maxLength={100}
                   placeholder="Peak Name"
-                  value={auth.currentPeak?.peak_name}
+                  value={currentPeak?.peak_name}
                   onChange={onChange}
                 />
               </div>
@@ -106,7 +78,7 @@ const PeakForm = ({ peaks, setPeaks }: IProps) => {
                   name="summit_date"
                   type="date"
                   placeholder="Summit Date"
-                  value={auth.currentPeak?.summit_date}
+                  value={currentPeak?.summit_date}
                   onChange={onChange}
                 />
               </div>
@@ -126,7 +98,7 @@ const PeakForm = ({ peaks, setPeaks }: IProps) => {
                   maxLength={100}
                   step={0.1}
                   placeholder="Latitude"
-                  value={auth.currentPeak?.latitude}
+                  value={currentPeak?.latitude}
                   onChange={onChange}
                 />
               </div>
@@ -146,7 +118,7 @@ const PeakForm = ({ peaks, setPeaks }: IProps) => {
                   maxLength={100}
                   step={0.1}
                   placeholder="Longitude"
-                  value={auth.currentPeak?.longitude}
+                  value={currentPeak?.longitude}
                   onChange={onChange}
                 />
               </div>
@@ -164,7 +136,7 @@ const PeakForm = ({ peaks, setPeaks }: IProps) => {
                   name="peak_description"
                   maxLength={300}
                   placeholder="Peak Description"
-                  value={auth.currentPeak?.peak_description}
+                  value={currentPeak?.peak_description}
                   onChange={onChange}
                 />
               </div>
