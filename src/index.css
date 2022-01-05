@@ -18,6 +18,89 @@ html {
     min-width: 100%;
 }
 
-#map {
+/* #map {
     margin-top: 75px;
+} */
+#map { 
+    position: absolute;
+    left: 0%;
+    top: 0;
+    bottom: 0;
+    transition: 0.55s;
+    width: 100%;
 }
+.toggle-overlay {
+    position: absolute;
+    top: 0;
+    /* bottom: 0; */
+    left: 0%;
+    background-color: transparent;
+    max-height: 100vh;
+    transition: 0.55s;
+    overflow: hidden;
+}
+
+.toggle-overlay button {
+    font-size: xx-large;
+    padding: 10px 20px 10px 20px;
+    border: 4px solid #000;
+    border-radius: 25px;
+    background: #efefef;
+}
+
+.map-overlay {
+    position: absolute;
+    width: 0%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    height: 75vh;
+    background-color: #efefef;
+    max-height: 100vh;
+    transition: 0.55s;
+    overflow: hidden;
+}
+     
+.map-overlay fieldset {
+    display: none;
+    background: #ddd;
+    border: none;
+    padding: 10px;
+    margin: 0;
+}
+     
+.map-overlay input {
+    display: block;
+    border: none;
+    width: 100%;
+    border-radius: 3px;
+    padding: 10px;
+    margin: 0;
+    box-sizing: border-box;
+}
+     
+.map-overlay .listing {
+    overflow: auto;
+    max-height: 100%;
+}
+     
+.map-overlay .listing > * {
+    display: block;
+    padding: 5px 10px;
+    margin: 0;
+}
+     
+.map-overlay .listing a {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    color: #404;
+    text-decoration: none;
+}
+     
+.map-overlay .listing a:last-child {
+    border: none;
+}
+     
+.map-overlay .listing a:hover {
+    background: #f0f0f0;
+}
+
