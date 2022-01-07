@@ -1,4 +1,4 @@
-const featureCollection: GeoJSON.FeatureCollection = {
+let featureCollection: GeoJSON.FeatureCollection = {
   type: "FeatureCollection",
   features: [
     {

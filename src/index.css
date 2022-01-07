@@ -49,9 +49,9 @@ html {
 }
 
 .map-overlay {
-    position: absolute;
+    position: fixed;
     width: 0%;
-    top: 0;
+    top: 20%;
     bottom: 0;
     left: 0;
     height: 75vh;
@@ -90,17 +90,17 @@ html {
     margin: 0;
 }
      
-.map-overlay .listing a {
+.map-overlay .listing button {
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    color: #404;
+    color: rgb(13, 31, 36);
     text-decoration: none;
 }
      
-.map-overlay .listing a:last-child {
+.map-overlay .listing button:last-child {
     border: none;
 }
      
-.map-overlay .listing a:hover {
+.map-overlay .listing button:hover {
     background: #f0f0f0;
 }
 
