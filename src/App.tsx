@@ -1,45 +1,45 @@
-// import { Routes, Route } from "react-router-dom";
-
-// import Dashboard from "./views/app/Dashboard";
-// import Login from "./views/auth/Login";
-// import Logout from "./views/auth/Logout";
-// import Register from "./views/auth/Register";
-// import { AuthProvider } from "./customHooks/AuthHook";
-// import NotFound from "./views/404/NotFound";
-// import Navbar from "./components/layout/Navbar";
 import React from "react";
-import { AuthProvider } from './context/Auth';
-import { Router } from './routes/Router';
-import { PeakProvider } from "./context/Peak";
+// import { AuthProvider } from './context/Auth';
+// import { Router } from './routes/Router';
+// import { PeakProvider } from "./context/Peak";
+// import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import store, { persistor } from "./store"
+import { PersistGate } from "redux-persist/integration/react";
+import { Provider } from "react-redux";
+// import Login from "./views/auth/Login";
+// import ProtectedRoute from "./routes/ProtectedRoute";
+// import Dashboard from "./views/app/Dashboard";
+// import PrivateRoute from "./privateRoute/PrivateRoute";
+// import RequireAuth from "./service/RequireAuth";
+import { CustomRouter } from "./routes/CustomRouter";
 
-// const App = () => {
-//   return (
-//     <div className="App">
-//       <AuthProvider>
-//         <Router>
-//           <Navbar/>
-//           <Routes>
-//             <Route path="/" element={<Dashboard />} />
-//             {/* <Route path="/dashboard" element={<Dashboard />} /> */}
-//             <Route path="/login" element={<Login />} />
-//             <Route path="/signup" element={<Signup />} />
-//             <Route path="/logout" element={<Logout />} />
-//             <Route path="*" element={<NotFound/>}/>
-//           </Routes>
-//         </Router>
-//       </AuthProvider>
-//     </div>
-//   );
-// };
+
 
 const App: React.FC = () => {
-  return (
-    <AuthProvider>
-      <PeakProvider>
-        <Router />
-      </PeakProvider>
-    </AuthProvider>
-  );
-};
+  //   return (
+  //     <AuthProvider>
+  //       <PeakProvider>
+  //         <Router />
+  //       </PeakProvider>
+  //     </AuthProvider>
+  //   );
 
+  return (
+    <Provider store={store}>
+      <PersistGate persistor={persistor} loading={null}>
+        {/* <Router>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={
+              <RequireAuth>
+                <Dashboard />
+              </RequireAuth>
+            } />
+          </Routes>
+        </Router> */}
+        <CustomRouter />
+      </PersistGate>
+    </Provider>
+  )
+};
 export default App;

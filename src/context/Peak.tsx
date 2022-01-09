@@ -12,7 +12,7 @@ type PeakContextData = {
     allPeaks?: PeakInterface[];
     setAllPeaks: Dispatch<SetStateAction<PeakInterface[] | undefined>>;
     getAllPeaks(): Promise<PeakInterface[] | undefined>;
-    createPeak(user: AuthedUser, peak: PeakInterface): Promise<PeakInterface | undefined>;
+    createPeak(user: AuthedUser, peak: PeakInterface): Promise<boolean>;
     loading: boolean;
 }
 
@@ -63,21 +63,23 @@ const PeakProvider: React.FC = ({ children }) => {
         }
     }
 
-    const createPeak = async (user: AuthedUser, peak: PeakInterface): Promise<PeakInterface | undefined> => {
+    const createPeak = async (user: AuthedUser, peak: PeakInterface): Promise<boolean> => {
         try {
-            const _createPeak = await peakService.postPeak(peak, user.user.id)
+            // const _createPeak = await peakService.postPeak(peak, user.user.id)
 
-            if (_createPeak) {
-                setAllPeaks((prevState: PeakInterface[] | undefined) => (prevState ? [
-                    ...prevState,
-                    _createPeak
-                  ] : [_createPeak]))
-                return _createPeak
-            } else {
-                return undefined
-            }
+            // if (_createPeak) {
+            //     setAllPeaks((prevState: PeakInterface[] | undefined) => (prevState ? [
+            //         ...prevState,
+            //         _createPeak
+            //       ] : [_createPeak]))
+            //     return _createPeak
+            // } else {
+            //     return undefined
+            // }
+            return false
         } catch (e) {
             console.log(e)
+            return false
         }
     }
 

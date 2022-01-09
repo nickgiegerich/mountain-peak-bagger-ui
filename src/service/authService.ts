@@ -1,24 +1,16 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { AuthedUser } from "../interface/UserInterface";
+import { useDispatch } from "react-redux";
 
-const login = async (
-  email: string,
-  password: string
-): Promise<AuthedUser | undefined> => {
+const login = async (email: string, password: string): Promise<AxiosResponse<any, any> | boolean> => {
   try {
     const response = await axios.post(
       process.env.REACT_APP_BASE_API_URL + "/api/auth/login/",
       { email, password }
     );
-
-    console.log(response.data);
-
-    if (response.data.access) {
-      localStorage.setItem("@user", JSON.stringify(response.data));
-    }
-    return response.data.user as AuthedUser;
+    return response
   } catch (error: any) {
-    return undefined;
+    return false;
   }
 };
 
@@ -26,19 +18,16 @@ const register = async (
   email: string,
   username: string,
   password: string
-): Promise<AuthedUser | string> => {
+): Promise<AxiosResponse<any, any> | boolean> => {
   try {
     const response = await axios.post(
       process.env.REACT_APP_BASE_API_URL + "/api/auth/register/",
       { email, username, password }
     );
-
-    if (response.data.access) {
-      localStorage.setItem("@user", JSON.stringify(response.data));
-    }
-    return response.data.user as AuthedUser;
+      console.log(response.data)
+   return response
   } catch (error: any) {
-    return error;
+    return false;
   }
 };
 

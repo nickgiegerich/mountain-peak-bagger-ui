@@ -1,15 +1,23 @@
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { MenuIcon, XIcon } from "@heroicons/react/outline";
 import { useAuth } from "../../context/Auth";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../store";
+
 
 function classNames(...classes: string[]): string {
   return classes.filter(Boolean).join(" ");
 }
 
 const Navbar = () => {
-  const auth = useAuth();
+  const auth = useSelector((state: RootState) => state.auth)
+  const [authedUser, setAuthedUser] = useState<any>(null)
+  
+  useEffect(() => {
+    setAuthedUser(auth)
+  }, [auth])
 
   const authNav = [{ name: "Dashboard", to: "/", current: true }];
 
@@ -51,7 +59,7 @@ const Navbar = () => {
                 </div>
                 <div className="hidden my-auto sm:block sm:ml-6">
                   <div className="flex space-x-4">
-                    {auth.authedUser ? (
+                    {auth.account ? (
                       <Fragment>
                         {authNav.map((item) => (
                           <Link
@@ -101,7 +109,7 @@ const Navbar = () => {
                 </button> */}
 
                 {/* Profile dropdown */}
-                {auth.authedUser && (
+                {auth.account && (
                   <Menu as="div" className="ml-3 relative">
                     <div>
                       <Menu.Button className="bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
@@ -130,8 +138,9 @@ const Navbar = () => {
                                 active ? "bg-gray-100" : "",
                                 "block px-4 py-2 text-sm text-gray-700"
                               )}
+                            // @ts-ignore: Unreachable code error
                             >
-                              signed in as {auth.authedUser?.user.username}
+                              signed in as {auth.account?.user.email}
                             </p>
                           )}
                         </Menu.Item>
@@ -157,7 +166,7 @@ const Navbar = () => {
           </div>
 
           <Disclosure.Panel className="sm:hidden">
-            {auth.authedUser ? (
+            {auth.account ? (
               <div className="px-2 pt-2 pb-3 space-y-1">
                 {authNav.map((item) => (
                   <Disclosure.Button

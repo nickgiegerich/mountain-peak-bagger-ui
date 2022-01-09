@@ -9,9 +9,9 @@ type AuthContextData = {
     currentPeak?: PeakInterface | undefined;
     setCurrentPeak: Dispatch<SetStateAction<PeakInterface | undefined>>;
     loading: boolean;
-    login(email: string, password: string): Promise<undefined | AuthedUser>;
+    login(email: string, password: string): Promise<boolean>;
     logout(): Promise<void>;
-    register(email: string, username: string, password: string): Promise<string | AuthedUser>;
+    register(email: string, username: string, password: string): Promise<boolean>;
 }
 
 // Create the Auth Context with the data type specified
@@ -46,48 +46,42 @@ const AuthProvider: React.FC = ({ children }) => {
         }
     }
 
-    const login = async (email: string, password: string): Promise<undefined | AuthedUser> => {
+    const login = async (email: string, password: string): Promise<boolean> => {
         try {
             // call the service passing credential (email and password).
             const _authedUser = await authService.login(email, password)
 
-            if (typeof (_authedUser) === 'object') {
-                //Set the data in the context, so the App can be notified
-                //and send the user to the AuthStack
-                console.log('worked on login')
-                setAuthedUser(_authedUser);
-                return _authedUser
-            }
-
-            setAuthedUser(undefined);
-
-            return _authedUser
+            // if (typeof (_authedUser) === 'object') {
+            //     //Set the data in the context, so the App can be notified
+            //     //and send the user to the AuthStack
+            //     console.log('worked on login')
+            //     setAuthedUser(_authedUser);
+            //     return _authedUser
+            // }
+            return false
 
         } catch (e) {
-            return undefined
-        } finally {
-            setLoading(false)
+            return false
         }
     }
 
-    const register = async (email: string, username: string, password: string): Promise<string | AuthedUser> => {
+    const register = async (email: string, username: string, password: string): Promise<boolean> => {
         try {
             const _authedUser = await authService.register(email, username, password)
 
-            if (typeof (_authedUser) === 'object') {
-                //Set the data in the context, so the App can be notified
-                //and send the user to the AuthStack
-                setAuthedUser(_authedUser);
-                return _authedUser
-            }
+            // if (typeof (_authedUser) === 'object') {
+            //     //Set the data in the context, so the App can be notified
+            //     //and send the user to the AuthStack
+            //     setAuthedUser(_authedUser);
+            //     return _authedUser
+            // }
 
-            setAuthedUser(undefined)
-            return _authedUser
+            // setAuthedUser(undefined)
+            // return _authedUser
+            return false
         } catch (e) {
-            return "error at register Auth.tsx"
-        } finally {
-            setLoading(false)
-        }
+            return false
+        } 
     }
 
     const logout = async () => {

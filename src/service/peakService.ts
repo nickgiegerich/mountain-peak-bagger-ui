@@ -2,6 +2,7 @@ import axios from "axios";
 import { useAuth } from "../context/Auth";
 import { PeakInterface } from "../interface/PeakInterface";
 import { AuthedUser } from "../interface/UserInterface";
+import { PeakObject } from "../utils/types/peakTypes";
 import authHeader from "./auth-header";
 
 const user: AuthedUser | string | null = localStorage.getItem("@user");
@@ -46,15 +47,16 @@ const getAllPeaks = async (): Promise<PeakInterface[] | undefined> => {
 };
 
 const postPeak = async (
-  peak: PeakInterface,
-  userId: number
-): Promise<PeakInterface | undefined> => {
+  peak: PeakObject,
+  userId: number,
+  token: string
+): Promise<PeakObject | undefined> => {
   try {
     
     const response = await axios.post(
       process.env.REACT_APP_BASE_API_URL + "/api/peaks/",
       { ...peak, user: userId },
-      { headers: await authHeader() }
+      { headers: {Authorization: "Bearer " + token}, }
     );
 
     if (response.status === 201) {

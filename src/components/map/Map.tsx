@@ -6,14 +6,16 @@ import { PeakInterface } from "../../interface/PeakInterface";
 import { usePeak } from "../../context/Peak";
 import featureCollection from "../../lib/north-america-peaks";
 import fetchImg from "../../lib/fetchImage";
+import { PeakObject } from "../../utils/types/peakTypes";
 
 mapboxgl.accessToken = `${process.env.REACT_APP_MAP_TOKEN}`;
 
-interface props {
-  peakList: PeakInterface[]
+type props = {
+  peakObject: PeakObject | undefined, 
+  setPeakObject: React.Dispatch<React.SetStateAction<PeakObject>>;
 }
 
-const MyMap = ({ peakList }: props) => {
+const MyMap: React.FC<props> = ({peakObject, setPeakObject}) => {
   const { setCurrentPeak } = usePeak(); // context for peak object
 
   // CONSTANTS FOR MAP INIT
@@ -29,23 +31,19 @@ const MyMap = ({ peakList }: props) => {
   const [sideBarOpen, setSideBarOpen] = useState<boolean>(false)
 
   // making reference to the filterEl input and listingEl list of peaks seen on map
-  const filterEl = (document.getElementById('feature-filter') as HTMLInputElement);
-  const listingEl = document.getElementById('feature-listing') as HTMLInputElement;
+  // const filterEl = (document.getElementById('feature-filter') as HTMLInputElement);
+  // const listingEl = document.getElementById('feature-listing') as HTMLDivElement;
+
+  // const[filterEl, setFilterEl] = useState<HTMLCollectionOf<Element>>(document.getElementsByTagName('feature-filter'))
+  // const [listingEl, setListingEl] = useState<HTMLElement | null>(document.getElementById('feature-listing'))
 
   // map init variables 
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map>();
   const [mapMarkers, setMapMarkers] = useState<mapboxgl.Marker[]>()
 
-  // const geocoder = new MapboxGeocoder({
-  //   accessToken: mapboxgl.accessToken,
-  //   marker: false, types: 'poi',
-  //   // @ts-ignore: Unreachable code error
-  //   mapboxgl: mapboxgl
-  // })
-
   // used when a user double clicks the map to set a marker
-  const newPeakMarker = new mapboxgl.Marker({ color: '#48A14D' })
+  // const newPeakMarker = new mapboxgl.Marker({ color: '#48A14D' })
 
   // div reference for setting popup html
   const popupDiv = window.document.createElement('div')
@@ -66,15 +64,13 @@ const MyMap = ({ peakList }: props) => {
     'left': [markerRadius, (markerHeight - markerRadius) * -1],
     'right': [-markerRadius, (markerHeight - markerRadius) * -1]
   };
-  const popup = new mapboxgl.Popup({ offset: popupOffsets }) // popup object
+  // const popup = new mapboxgl.Popup({ offset: popupOffsets }) // popup object
 
-  // on initial load get previous markers
-  // TODO: implement this in a later version of the app
-  useEffect(() => {
-    const markers = loadPeakMarkers();
-    console.log(markers)
-    setMapMarkers(markers);
-  }, [peakList])
+  const [popup, setPopup] = useState(new mapboxgl.Popup({ offset: popupOffsets }))
+
+  function handlePeakSelectionChange(label: string, lat: number, lng: number) {
+    setPeakObject({label: label, latitude: lat, longitude: lng})
+  }
 
   useEffect(() => {
     if (mapRef.current) return; // if map exist return
@@ -87,6 +83,11 @@ const MyMap = ({ peakList }: props) => {
       center: [LNG, LAT],
       zoom: ZOOM
     })
+
+    const filterEl = (document.getElementById('feature-filter') as HTMLInputElement);
+    const listingEl = document.getElementById('feature-listing') as HTMLDivElement;
+
+    // filterEl?.getElementsByTagName('feature-filter')
 
     // add a custom id prop to our geojson data
     // TODO: add this field to static data so we save load resources
@@ -106,53 +107,17 @@ const MyMap = ({ peakList }: props) => {
         {
           type: "geojson",
           data: featureCollection,
-          cluster: false,
-          clusterMaxZoom: 14, // Max zoom to cluster points on
-          clusterRadius: 30 // Radius of each cluster when clustering points (defaults to 50)
         })
 
       // cluster layer
       map.addLayer({
-        id: 'peak-clusters',
-        type: 'circle',
-        source: 'source',
-        filter: ['has', 'point_count'], // cluster auto adds this to our data
-        paint: {
-          'circle-color': '#51bbd6',
-          'circle-radius': [
-            'step',
-            ['get', 'point_count'],
-            20,
-            100,
-            30,
-            750,
-            40
-          ]
-        }
-      })
-
-      // layer for adding the number on the cluster point
-      map.addLayer({
-        id: 'peak-cluster-count',
-        type: 'symbol',
-        source: 'source',
-        filter: ['has', 'point_count'],
-        layout: {
-          'text-field': '{point_count_abbreviated}',
-          'text-size': 12
-        }
-      })
-
-      // the unclustered peak point, shows as our custom image with text
-      map.addLayer({
-        id: 'unclustered-peak',
+        id: 'peaks',
         source: 'source',
         type: 'symbol',
-        // filter: ['!', ['has', 'point_count']],
         paint: {
           "text-color": "#FFF",
           "text-halo-color": "#000",
-          "text-halo-width": 1,
+          "text-halo-width": 4,
           "icon-opacity": 1,
           "text-opacity": 1,
         },
@@ -164,45 +129,24 @@ const MyMap = ({ peakList }: props) => {
           "text-field": ["get", "name"],
           "text-ignore-placement": false,
           "text-allow-overlap": false,
-          "text-size": 10,
+          "text-size": 14,
           "text-anchor": "top",
           "text-optional": true,
           "icon-image": "mt-peak",
         }
       })
 
-      map.on('click', 'peak-clusters', (e) => {
-        const features = map.queryRenderedFeatures(e.point, {
-          layers: ['peak-clusters']
-        });
-        const clusterId = features[0]?.properties?.cluster_id;
-
-        // @ts-ignore: Unreachable code error
-        map.getSource('source').getClusterExpansionZoom(
-          clusterId,
-          // @ts-ignore: Unreachable code error
-          (err, zoom) => {
-            if (err) return;
-
-            map.easeTo({
-              // @ts-ignore: Unreachable code error
-              center: features[0].geometry.coordinates,
-              zoom: zoom
-            })
-          }
-        )
-      })
-
       // When a click event occurs on a feature in
       // the unclustered-point layer, open a popup at
       // the location of the feature, with
       // description HTML from its properties.
-      map.on('click', 'unclustered-peak', (e) => {
+      map.on('click', 'peaks', (e) => {
         if (e.features !== undefined && e.features[0].geometry.type === 'Point') {
           const coordinates = e.features[0].geometry.coordinates.slice()
           const name = e.features[0].properties?.name
           const feet = e.features[0].properties?.feet
           const meters = e.features[0].properties?.meters
+          const stringBuilder = `${name} - elevation ${feet} ft. (${meters} m)`
           // const countries = e.features[0].properties?.countries[0]
 
           // Ensure that if the map is zoomed out such that
@@ -212,30 +156,36 @@ const MyMap = ({ peakList }: props) => {
             coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
           }
 
-          new mapboxgl.Popup({ offset: popupOffsets })
-            .setLngLat(coordinates as LngLatLike)
-            .setHTML(
-              `<div><h1 className="text-white" style="font-size: 20px; font-weight: 400; margin-bottom: 10px; text-transform: capitalize;">${name}</h1> <h1>${feet} ft.</h1> <h1>${meters} m</h1> </div>`
-            )
-            .addTo(map);
+          // new mapboxgl.Popup({ offset: popupOffsets })
+          //   .setLngLat(coordinates as LngLatLike)
+          //   .setHTML(
+          //     `<div><h1 className="text-white" style="font-size: 20px; font-weight: 400; margin-bottom: 10px; text-transform: capitalize;">${name}</h1> <h1>${feet} ft.</h1> <h1>${meters} m</h1> </div>`
+          //   )
+          //   .addTo(map);
 
-
+          setPeakPopup(map, e.features[0])
+          map.flyTo({// @ts-ignore: Unreachable code error
+            center: e.features[0].geometry.coordinates,
+            zoom: 8
+          })
+          handlePeakSelectionChange(stringBuilder, coordinates[1], coordinates[0])
         }
       })
 
       map.on('movestart', () => {
-        map.setFilter('unclustered-peak', ['has', 'name'])
+        map.setFilter('peaks', ['has', 'name'])
+
       })
 
       map.on('moveend', () => {
-        // if (filterEl!.value === '') {
-        const features = map.queryRenderedFeatures(undefined, { layers: ['unclustered-peak'] });
+
+        const features = map.queryRenderedFeatures(undefined, { layers: ['peaks'] });
 
         if (features) {
 
           const uniqueFeatures = getUniqueFeatures(features, 'name', 'feet')
 
-          renderlistings(uniqueFeatures, map)
+          renderlistings(uniqueFeatures, map, listingEl, filterEl)
 
           // Clear the input container
           // if (filterEl) {
@@ -245,7 +195,6 @@ const MyMap = ({ peakList }: props) => {
           peak_search_list = uniqueFeatures
 
         }
-        // }
       })
 
       filterEl?.addEventListener('keyup', (e: any) => {
@@ -256,7 +205,7 @@ const MyMap = ({ peakList }: props) => {
 
 
         if (value == '') { // if there is no value set map to original 
-          map.setFilter('unclustered-peak', ['has', 'name'])
+          map.setFilter('peaks', ['has', 'name'])
         } else {
           console.log('value: ', value)
         }
@@ -269,16 +218,12 @@ const MyMap = ({ peakList }: props) => {
           }
         })
 
-        console.log('filtered list: ', filtered)
-        console.log('peak searchable list: ', peak_search_list)
-
-
         // Populate the sidebar with filtered results
-        renderlistings(filtered, map);
+        renderlistings(filtered, map, listingEl, filterEl);
 
         // Set the filter to populate features into the layer.
         if (filtered.length) {
-          map.setFilter('unclustered-peak', [
+          map.setFilter('peaks', [
             'match',
             ['get', 'id'],
             filtered.map((feature) => {
@@ -293,14 +238,14 @@ const MyMap = ({ peakList }: props) => {
       // end of onload
     })
 
-    map.on('dblclick', (event) => {
-      console.log(event.lngLat)
-      const point = event.lngLat
-      newPeakMarker.setLngLat(point).addTo(map).setPopup(popup).setDraggable(true)
-      setPeak(newPeakMarker)
-      setPopup(newPeakMarker, map)
-      newPeakMarker.on('dragend', () => onDragEnd(newPeakMarker, map))
-    })
+    // map.on('dblclick', (event) => {
+    //   console.log(event.lngLat)
+    //   const point = event.lngLat
+    //   newPeakMarker.setLngLat(point).addTo(map).setPopup(popup).setDraggable(true)
+    //   setPeak(newPeakMarker)
+    //   setPopup(newPeakMarker, map)
+    //   newPeakMarker.on('dragend', () => onDragEnd(newPeakMarker, map))
+    // })
 
     mapMarkers?.map((marker) => {
       marker.addTo(map)
@@ -316,84 +261,95 @@ const MyMap = ({ peakList }: props) => {
     //   newPeakMarker.on('dragend', () => onDragEnd(newPeakMarker, map))
     // })
 
-  }, [mapMarkers]);
+  }, []);
 
-  const onDragEnd = (marker: mapboxgl.Marker, map: mapboxgl.Map) => {
-    setPopup(marker, map)
-    setPeak(marker)
-  }
+  // const onDragEnd = (marker: mapboxgl.Marker, map: mapboxgl.Map) => {
+  //   setPopup(marker, map)
+  //   setPeak(marker)
+  // }
 
-  function setPeak(marker: mapboxgl.Marker) {
-    setCurrentPeak((prevState: PeakInterface | undefined) => ({
-      ...prevState,
-      longitude: marker.getLngLat().lng,
-      latitude: marker.getLngLat().lat
-    }));
-  }
+  // function setPeak(marker: mapboxgl.Marker) {
+  //   setCurrentPeak((prevState: PeakInterface | undefined) => ({
+  //     ...prevState,
+  //     longitude: marker.getLngLat().lng,
+  //     latitude: marker.getLngLat().lat
+  //   }));
+  // }
 
-  function setPopup(marker: mapboxgl.Marker, map: mapboxgl.Map) {
-    popupDiv.innerHTML = `<h1>Longitude: ${marker.getLngLat().lng}</h1> <h1>Latitude: ${marker.getLngLat().lat}</h1>`
-    popup.setLngLat(marker.getLngLat()).setDOMContent(popupDiv).setMaxWidth("500px")
-    popup.addTo(map)
-  }
+  // function setPopup(marker: mapboxgl.Marker, map: mapboxgl.Map) {
+  //   popupDiv.innerHTML = `<h1>Longitude: ${marker.getLngLat().lng}</h1> <h1>Latitude: ${marker.getLngLat().lat}</h1>`
+  //   popup.setLngLat(marker.getLngLat()).setDOMContent(popupDiv).setMaxWidth("500px")
+  //   popup.addTo(map)
+  // }
 
-  function loadPeakMarkers() {
+  // function loadPeakMarkers() {
 
-    const markers: mapboxgl.Marker[] = []
-    peakList.map((peak: PeakInterface, idx) => {
-      if (peak.longitude && peak.latitude) {
+  //   const markers: mapboxgl.Marker[] = []
+  //   peakList.map((peak: PeakInterface, idx) => {
+  //     if (peak.longitude && peak.latitude) {
 
-        // create marker location
-        const lngLat: LngLatLike = [peak.longitude, peak.latitude]
+  //       // create marker location
+  //       const lngLat: LngLatLike = [peak.longitude, peak.latitude]
 
-        // create marker popup
-        const popupDiv = window.document.createElement('div') // div creation for popup
-        const popup = new mapboxgl.Popup({ offset: popupOffsets }) // popup object
-        popupDiv.innerHTML = `<div  id='peak-${idx}'><h1 className="text-white" style="font-size: 20px; font-weight: 400; margin-bottom: 10px; text-transform: capitalize;">${peak.peak_name}</h1> <h1>${peak.peak_description ? peak.peak_description : ''}</h1> </div>`
+  //       // create marker popup
+  //       const popupDiv = window.document.createElement('div') // div creation for popup
+  //       const popup = new mapboxgl.Popup({ offset: popupOffsets }) // popup object
+  //       popupDiv.innerHTML = `<div  id='peak-${idx}'><h1 className="text-white" style="font-size: 20px; font-weight: 400; margin-bottom: 10px; text-transform: capitalize;">${peak.peak_name}</h1> <h1>${peak.peak_description ? peak.peak_description : ''}</h1> </div>`
 
-        popup.setLngLat(lngLat).setDOMContent(popupDiv).setMaxWidth("300px")
+  //       popup.setLngLat(lngLat).setDOMContent(popupDiv).setMaxWidth("300px")
 
-        const newMarker = new mapboxgl.Marker()
-          .setLngLat(lngLat).setPopup(popup)
+  //       const newMarker = new mapboxgl.Marker()
+  //         .setLngLat(lngLat).setPopup(popup)
 
-        newMarker.on('click', () => {
-          console.log('double clicked')
-        })
-        // add markers to marker list
-        markers.push(newMarker)
+  //       newMarker.on('click', () => {
+  //         console.log('double clicked')
+  //       })
+  //       // add markers to marker list
+  //       markers.push(newMarker)
 
 
-      }
-    })
-    return markers
-  }
+  //     }
+  //   })
+  //   return markers
+  // }
 
-  function renderlistings(features: mapboxgl.MapboxGeoJSONFeature[], map: mapboxgl.Map) {
-    const empty = document.createElement('p');
+  function renderlistings(features: mapboxgl.MapboxGeoJSONFeature[], map: mapboxgl.Map, listingEl: any, filterEl: any) {
+    const empty = document.createElement('p'); // new p tag element
     // Clear any existing listings
     if (listingEl) {
       listingEl.innerHTML = '';
       if (features.length > 0) {
         for (const feature of features) {
           const itemButton = document.createElement('button');
-          const label = `${feature.properties?.name}`;
+          // @ts-ignore: Unreachable code error
+          const coordinates = feature.geometry.coordinates.slice()
+          const peakName = `${feature.properties?.name}`;
+          const peakElevationFeet = `${feature.properties?.feet}`;
+          const peakElevationMeters = `${feature.properties?.meters}`;
+          
+          const stringBuilder = `${peakName} - elevation ${peakElevationFeet} ft. (${peakElevationMeters} m)`
+
           // itemLink.href = '#';
           // itemLink.target = '_blank';
-          itemButton.textContent = label;
+          itemButton.textContent = peakName;
           itemButton.addEventListener('mouseover', () => {
             // Highlight corresponding feature on the map
-            popup
-              // @ts-ignore: Unreachable code error
-              .setLngLat(feature.geometry.coordinates)
-              .setText(label)
-              .addTo(map);
+            // popup
+            //   // @ts-ignore: Unreachable code error
+            //   .setLngLat(feature.geometry.coordinates)
+            //   .setText(label)
+            //   .addTo(map);
+            setPeakPopup(map, feature)
+            
+            
           });
           itemButton.addEventListener('click', () => {
             map.flyTo({// @ts-ignore: Unreachable code error
               center: feature.geometry.coordinates,
-              zoom: 10
+              zoom: 8
             })
-
+            
+            handlePeakSelectionChange(stringBuilder, coordinates[1], coordinates[0])
           });
           listingEl!.appendChild(itemButton);
         }
@@ -402,7 +358,7 @@ const MyMap = ({ peakList }: props) => {
         // @ts-ignore: Unreachable code error
         filterEl.parentNode.style.display = 'block';
 
-      } else if (features.length === 0 && filterEl.value !== '') {
+      } else if (features.length === 0 && filterEl!.value !== '') {
         empty.textContent = 'No results found';
         listingEl.appendChild(empty);
 
@@ -444,6 +400,13 @@ const MyMap = ({ peakList }: props) => {
     return string.trim().toLowerCase();
   }
 
+  function setPeakPopup(map: mapboxgl.Map, feature: mapboxgl.MapboxGeoJSONFeature) {
+    const label = feature.properties?.name
+    if (feature.geometry.type === 'Point') {
+      setPopup(popup.setLngLat(feature.geometry.coordinates as LngLatLike).setText(label).addTo(map))
+    }
+  }
+
   function toggleSideBar() {
     if (sideBarOpen) {
       (document.getElementById('sideBar') as HTMLDivElement).style.width = "0%";
@@ -455,7 +418,7 @@ const MyMap = ({ peakList }: props) => {
       (document.getElementById('sideBar') as HTMLDivElement).style.width = "25%";
       (document.getElementById('toggleButton') as HTMLDivElement).style.left = "25%";
       // (document.getElementById('map') as HTMLDivElement).style.left = "25%";
-      // (document.getElementById('map') as HTMLDivElement).style.width = "0%";
+      // (document.getElementById('map') as HTMLDivElement).style.width = "100%";
       setSideBarOpen(true)
     }
   }
@@ -464,18 +427,18 @@ const MyMap = ({ peakList }: props) => {
     <div className="h-56 w-screen px-5">
       <div id="map" ref={mapContainer as React.LegacyRef<HTMLDivElement> | undefined} style={{ height: "75vh" }} className="map-container"></div>
       {/* <div id="geocoder" className="geocoder"></div> */}
-      <div className="absolute">
-        <div id="sideBar" className="map-overlay">
-          <fieldset>
-            <input id="feature-filter" type="text" placeholder="Filter results by name" />
-          </fieldset>
-          <div id="feature-listing" className="listing">
-            Drag the map to populate results
-          </div>
+
+      <div id="sideBar" className="map-overlay">
+        <fieldset>
+          <input id="feature-filter" type="text" placeholder="Filter results by name" />
+        </fieldset>
+        <div id="feature-listing" className="listing">
+          Drag the map to populate results
         </div>
       </div>
+
       <div id="toggleButton" className="toggle-overlay">
-        <button onClick={() => toggleSideBar()}>{sideBarOpen ? 'X' : <span>&#9776;</span>}</button>
+        <button onClick={() => toggleSideBar()}>{sideBarOpen ? 'X' : <span> filter map &#9776;</span>}</button>
       </div>
     </div>
   );

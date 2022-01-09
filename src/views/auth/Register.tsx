@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/Auth";
+import { useDispatch } from "react-redux";
+import authSlice from "../../store/slices/auth";
+import { authService } from "../../service/authService";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Register = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { state } = useLocation();
+
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password1, setPassword1] = useState("");
@@ -13,9 +21,21 @@ const Register = () => {
   const onSubmit = async (e: any) => {
     e.preventDefault();
 
-    const authorized = await auth.register(email, username, password2);
+    const _authorized = await authService.register(email, username, password2);
 
-    if (!authorized) {
+    if (typeof (_authorized) === 'object') {
+      dispatch(
+        authSlice.actions.setAuthTokens({
+          token: _authorized.data.access,
+          refreshToken: _authorized.data.refresh,
+        })
+      );
+
+      dispatch(authSlice.actions.setAccount(_authorized.data));
+      setErrors(false)
+      navigate(state?.path || "/")
+    } else {
+
       setEmail("");
       setPassword1("");
       setPassword2("");
@@ -38,7 +58,7 @@ const Register = () => {
         </div>
 
         <div className="relative block mx-auto my-10 w-full text-center">
-          {auth.loading === false && <h1 className="text-3xl font-light">register</h1>}
+          <h1 className="text-3xl font-light">register</h1>
         </div>
         <div className="relative block mx-auto w-full text-center">
           <input

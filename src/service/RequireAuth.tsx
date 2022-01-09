@@ -1,12 +1,11 @@
-import React from "react";
-import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/Auth";
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
+import { RootState } from "../store";
 
 function RequireAuth({ children }: any) {
-    const { authedUser } = useAuth();
-    const location = useLocation();
+    const auth = useSelector((state: RootState) => state.auth)
 
-    return authedUser ? children : <Navigate to="/login" replace />
+    return auth.account ? children : <Navigate to="/login" replace />
 }
 
 export default RequireAuth;

@@ -1,9 +1,8 @@
-import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 
 // import { Loading } from "../components/Loading";
-import { useAuth } from "../context/Auth";
+// import { useAuth } from "../context/Auth";
 import NoAuth from "../service/NoAuth";
 import RequireAuth from "../service/RequireAuth";
 import NotFound from "../views/404/NotFound";
@@ -12,20 +11,20 @@ import Login from "../views/auth/Login";
 import Logout from "../views/auth/Logout";
 import Register from "../views/auth/Register";
 
-export const Router = () => {
-  const { loading } = useAuth();
+export const CustomRouter = () => {
+  // const { loading } = useAuth();
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center space-x-2 h-screen">
-        <div className="w-10 h-10 bg-blue-400 rounded-full animate-bounce animation-delay-75"></div>
-        <div className="w-10 h-10 bg-blue-400 rounded-full animate-bounce animation-delay-100"></div>
-        <div className="w-10 h-10 bg-blue-400 rounded-full animate-bounce animation-delay-150"></div>
-      </div >
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex items-center justify-center space-x-2 h-screen">
+  //       <div className="w-10 h-10 bg-blue-400 rounded-full animate-bounce animation-delay-75"></div>
+  //       <div className="w-10 h-10 bg-blue-400 rounded-full animate-bounce animation-delay-100"></div>
+  //       <div className="w-10 h-10 bg-blue-400 rounded-full animate-bounce animation-delay-150"></div>
+  //     </div >
+  //   );
+  // }
   return (
-    <BrowserRouter>
+    <Router>
       <Navbar />
       <Routes>
         <Route path="/" element={
@@ -51,6 +50,6 @@ export const Router = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
 
-    </BrowserRouter>
+    </Router>
   );
 };
