@@ -14,12 +14,22 @@ function classNames(...classes: string[]): string {
 const Navbar = () => {
   const auth = useSelector((state: RootState) => state.auth)
   const [authedUser, setAuthedUser] = useState<any>(null)
-  
+  const [currentNavName, setCurrentNavName] = useState<string>("My Peaks")
+
   useEffect(() => {
     setAuthedUser(auth)
   }, [auth])
 
-  const authNav = [{ name: "Dashboard", to: "/", current: true }];
+  const authNav = [
+    { name: "Dashboard", to: "/", current: currentNavName === 'Dashboard' },
+    { name: "My Peaks", to: "/my-list", current: currentNavName === 'My Peaks' },
+  ];
+
+  const [authNavigation, setAuthNavigation] = useState<any>()
+
+  useEffect(() => { 
+    setAuthNavigation(authNav)
+  }, [currentNavName])
 
   const nav = [
     { name: "Login", to: "/login", current: false },
@@ -168,11 +178,12 @@ const Navbar = () => {
           <Disclosure.Panel className="sm:hidden">
             {auth.account ? (
               <div className="px-2 pt-2 pb-3 space-y-1">
-                {authNav.map((item) => (
+                {authNavigation?.map((item: any) => (
                   <Disclosure.Button
                     key={item.name}
                     as="a"
                     href={item.to}
+                    onClick={() => setCurrentNavName(item.name)}
                     className={classNames(
                       item.current
                         ? "bg-gray-900 text-white"

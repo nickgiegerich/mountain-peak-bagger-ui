@@ -20,17 +20,6 @@ const user: AuthedUser | string | null = localStorage.getItem("@user");
  *
  */
 
-const testPeakPost = {
-  peak_name: "test peak name",
-  peak_description: "test peak description",
-  longitude: 100,
-  latitude: 200.0,
-  summitted: "True",
-  attempt_date: "2021-12-13",
-  summit_date: "2021-12-13",
-  user: 1,
-};
-
 const getAllPeaks = async (): Promise<PeakInterface[] | undefined> => {
   try {
     const response = await axios.get(
@@ -46,31 +35,52 @@ const getAllPeaks = async (): Promise<PeakInterface[] | undefined> => {
   } catch (e) {}
 };
 
+/**
+ *
+ * @param peak
+ * @param userId
+ * @param token
+ * @returns status - number of the status response (ex: 200, 201, 401)
+ */
 const postPeak = async (
   peak: PeakObject,
   userId: number,
   token: string
-): Promise<PeakObject | undefined> => {
+): Promise<number> => {
   try {
-    
     const response = await axios.post(
       process.env.REACT_APP_BASE_API_URL + "/api/peaks/",
       { ...peak, user: userId },
-      { headers: {Authorization: "Bearer " + token}, }
+      { headers: { Authorization: "Bearer " + token } }
     );
 
-    if (response.status === 201) {
-      return response.data;
-    } else {
-      return undefined;
-    }
-    
+    return response.status;
   } catch (e) {
     console.log(e);
+    return 404;
+  }
+};
+
+const updatePeak = async (
+  peak: PeakObject,
+  userId: number,
+  token: string
+): Promise<number> => {
+  try {
+    const response = await axios.patch(
+      process.env.REACT_APP_BASE_API_URL + `/api/peaks/${peak.id}/`,
+      { ...peak, user: userId },
+      { headers: { Authorization: "Bearer " + token } }
+    );
+
+    return response.status;
+  } catch (e) {
+    return 404;
   }
 };
 
 export const peakService = {
   getAllPeaks,
   postPeak,
+  updatePeak,
 };

@@ -7,6 +7,7 @@ import NoAuth from "../service/NoAuth";
 import RequireAuth from "../service/RequireAuth";
 import NotFound from "../views/404/NotFound";
 import Dashboard from "../views/app/Dashboard";
+import MyPeakList from "../views/app/MyPeakList";
 import Login from "../views/auth/Login";
 import Logout from "../views/auth/Logout";
 import Register from "../views/auth/Register";
@@ -30,6 +31,11 @@ export const CustomRouter = () => {
         <Route path="/" element={
           <RequireAuth>
             <Dashboard />
+          </RequireAuth>
+        } />
+        <Route path="/my-list" element={
+          <RequireAuth>
+            <MyPeakList />
           </RequireAuth>
         } />
         <Route path="/login" element={

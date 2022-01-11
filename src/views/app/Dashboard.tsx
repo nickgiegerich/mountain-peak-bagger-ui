@@ -8,6 +8,7 @@ import { peakService } from "../../service/peakService";
 import { RootState } from "../../store";
 import { fetcher } from "../../utils/axiosInterceptor";
 import { PeakObject } from "../../utils/types/peakTypes";
+import toast, { Toaster } from 'react-hot-toast';
 
 
 const Dashboard = () => {
@@ -17,15 +18,25 @@ const Dashboard = () => {
   const { peaks, isLoading, isError } = usePeak();
   const { user } = useUser();
   const [currentPeakSelection, setCurrentPeakSelection] = useState<PeakObject>()
+  const notify = () => {
+    toast('Here is your toast.', {duration: 4000, position: 'bottom-center',className: '', style: { zIndex: 100}})
+  };
 
   function handlePeakSelectionChange(value: any) {
     setCurrentPeakSelection(value)
   }
 
-  function SubmitPeak() {
+  async function SubmitPeak() {
     // @ts-ignore: Unreachable code error
     if (auth.account?.user.id === user[0].id && currentPeakSelection && auth.account.user.id && auth.token) {
-      peakService.postPeak(currentPeakSelection, Number(auth.account?.user.id), auth.token)
+      const _response = await peakService.postPeak(currentPeakSelection, Number(auth.account?.user.id), auth.token)
+
+      if (_response === 201) {
+
+        // setCurrentPeakSelection(undefined)
+        notify()
+      }
+
     }
   }
 
